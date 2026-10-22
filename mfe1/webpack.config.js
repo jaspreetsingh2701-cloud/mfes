@@ -7,6 +7,7 @@
 
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const {ModuleFederationPlugin}  = require("webpack").container;
 
 module.exports = {
   mode: "development",
@@ -49,6 +50,20 @@ module.exports = {
   },
 
   plugins: [
+    new ModuleFederationPlugin({
+      name: 'mfe1',
+      remotes: {
+        'mfe2': "mfe2@http://localhost:3002/remoteEntry.js"
+      },
+      shared: {
+        'react': {
+          singleton: true
+        },
+        'react-dom': {
+          singleton: true
+        }
+      }
+    }),
     new HtmlWebpackPlugin({
       template: './public/index.html'
     }),
@@ -56,6 +71,9 @@ module.exports = {
 
   devServer: {
     port: 3001,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
     static: {
       directory: path.join(__dirname, "dist"),
     },
